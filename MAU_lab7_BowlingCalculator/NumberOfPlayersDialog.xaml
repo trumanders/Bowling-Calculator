@@ -1,0 +1,35 @@
+﻿<Window x:Class="MAU_lab7_BowlingCalculator.NumberOfPlayersDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MAU_lab7_BowlingCalculator"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="How many bowlers?" Height="150" Width="300"
+        >
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Image Source="bowling.ico" Width="32" Height="32" />
+                <Label x:Name="lbl_numOfPlayers" Grid.Column="1" Content="Number of players:" Margin="15"/>
+                <TextBox x:Name="tbx_numOfPlayers" Grid.Column="1" Grid.Row="1" Height="25" Width="50" HorizontalAlignment="Right" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button IsDefault="True" Name="btn_dialogOk" Click="btn_dialogOk_Click" HorizontalAlignment="Left" MinWidth="60" Margin="5">_Ok</Button>
+                <Button IsCancel="True" MinWidth="60" Margin="5">_Cancel</Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
