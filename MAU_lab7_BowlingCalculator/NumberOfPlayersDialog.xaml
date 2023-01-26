@@ -21,14 +21,13 @@
 
         
         <StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Image Source="bowling.ico" Width="32" Height="32" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">                
                 <Label x:Name="lbl_numOfPlayers" Grid.Column="1" Content="Number of players:" Margin="15"/>
                 <TextBox x:Name="tbx_numOfPlayers" Grid.Column="1" Grid.Row="1" Height="25" Width="50" HorizontalAlignment="Right" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button IsDefault="True" Name="btn_dialogOk" Click="btn_dialogOk_Click" HorizontalAlignment="Left" MinWidth="60" Margin="5">_Ok</Button>
-                <Button IsCancel="True" MinWidth="60" Margin="5">_Cancel</Button>
+                
             </StackPanel>
         </StackPanel>
     </Grid>

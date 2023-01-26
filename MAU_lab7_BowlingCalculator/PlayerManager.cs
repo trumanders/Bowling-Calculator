@@ -1,7 +1,7 @@
 ﻿namespace MAU_lab7_BowlingCalculator;
 public class PlayerManager
 {
-    private static int maxNumberOfPlayers = 6;
+    private static int maxNumberOfPlayers = 30;
     private int numberOfPlayers;
     private Player[] allPlayers;
 
@@ -18,11 +18,7 @@ public class PlayerManager
             {
                 allPlayers[i] = new Player();
             }            
-        }
-        else
-        {
-            MessageBox.Show("Please chose 1-" + maxNumberOfPlayers + " players");
-        }            
+        } 
     }
 
 

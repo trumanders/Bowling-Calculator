@@ -93,86 +93,78 @@ public class Calculator
             int firstScore = allRounds[currentRound].FirstScore;
             int secondScore = allRounds[currentRound].SecondScore;
             int thirdScore = allRounds[currentRound].ThirdScore;
+            Round thisRound = allRounds[currentRound];
+            Round prevRound = new Round();
+            Round prevPrevRound = new Round();
+            if (currentRound > 0)
+            {
+                prevRound = allRounds[currentRound - 1];
+            }
 
-            if (IsSkippingScoreChecking(allRounds, currentRound, isFirstBall)) return;           
-            
-            
+            if (currentRound > 1)
+            {
+                prevPrevRound = allRounds[currentRound - 2];
+            }
+
+            if (IsSkippingScoreChecking(allRounds, currentRound, isFirstBall)) return;            
 
             // On first ball - both previous rounds is strike - (from round number 3)
-            if (currentRound > 1 && isFirstBall && allRounds[currentRound - 2].IsStrike && allRounds[currentRound - 1].IsStrike)
+            if (currentRound > 1 && isFirstBall && prevPrevRound.IsStrike && prevRound.IsStrike)
             {
                 if (currentRound > 2)
-                {
-                    allRounds[currentRound - 2].Score = allRounds[currentRound - 3].Score + 20 + firstScore;
-                }
+                    prevPrevRound.Score = allRounds[currentRound - 3].Score + 20 + firstScore;
                 else if (currentRound == 2)
-                {
-                    allRounds[currentRound - 2].Score = 20 + firstScore;
-                }
+                    prevPrevRound.Score = 20 + firstScore;
             }
 
             /* On first ball - Previous is Spare */
-            else if (currentRound > 0 && isFirstBall && allRounds[currentRound - 1].IsSpare)
+            else if (currentRound > 0 && isFirstBall && prevRound.IsSpare)
             {
                 if (currentRound > 1)
-                {
-                    allRounds[currentRound - 1].Score = allRounds[currentRound - 2].Score + 10 + firstScore;
-                }
+                    prevRound.Score = prevPrevRound.Score + 10 + firstScore;
                 else if (currentRound == 1)
-                {
-                    allRounds[currentRound - 1].Score = 10 + firstScore;
-                }
+                    prevRound.Score = 10 + firstScore;
             }
 
             // If current is strike - skip to next round - only calculate this round after two rounds. 
-            if (allRounds[currentRound].IsStrike) continue;
+            if (thisRound.IsStrike) continue;
 
             /* On second ball - Previous round is Strike - set previous round score to include it's strike score + both balls on current round */
-            else if (currentRound > 0 && !isFirstBall && allRounds[currentRound - 1].IsStrike)
+            else if (currentRound > 0 && !isFirstBall && prevRound.IsStrike)
             {
                 // Include round score from two rounds back + previous round's strike score (10) + current round score
-                if (currentRound > 1)
-                {
-                    allRounds[currentRound - 1].Score = allRounds[currentRound - 2].Score + 10 + firstScore + secondScore;
-                }
+                if (currentRound > 1)                
+                    prevRound.Score = prevPrevRound.Score + 10 + firstScore + secondScore;
 
                 // If on second round - include round score + ball score from first round.
                 else if (currentRound == 1)
-                {
-                    allRounds[currentRound - 1].Score = 10 + firstScore + secondScore;
-                }
+                    prevRound.Score = 10 + firstScore + secondScore;
 
                 // Set current round score if not spare or strike
-                if (!allRounds[currentRound].IsStrike && !allRounds[currentRound].IsSpare)
-                    allRounds[currentRound].Score = allRounds[currentRound - 1].Score + firstScore + secondScore;
+                if (!thisRound.IsStrike && !thisRound.IsSpare)
+                    thisRound.Score = prevRound.Score + firstScore + secondScore;
             }
 
             /* On second ball - current AND previous is not Stike and not Spare */
-            else if (currentRound > 0 && !isFirstBall && !allRounds[currentRound].IsSpare && !allRounds[currentRound].IsStrike && !allRounds[currentRound - 1].IsSpare)
-            {
-                allRounds[currentRound].Score = allRounds[currentRound - 1].Score + firstScore + secondScore;
-            }
+            else if (currentRound > 0 && !isFirstBall && !thisRound.IsSpare && !thisRound.IsStrike && !prevRound.IsSpare)
+                thisRound.Score = prevRound.Score + firstScore + secondScore;
 
             /* On second ball, not first round - Current is not Strike NOR Spare*/
-            else if (currentRound != 0 && !isFirstBall && !allRounds[currentRound].IsSpare && !allRounds[currentRound].IsStrike && allRounds[currentRound - 1].Score > 0)
-            {
-                allRounds[currentRound].Score = allRounds[currentRound - 1].Score + firstScore + secondScore;
-            }
+            else if (currentRound != 0 && !isFirstBall && !thisRound.IsSpare && !thisRound.IsStrike && prevRound.Score > 0)
+                thisRound.Score = prevRound.Score + firstScore + secondScore;
 
             // If on first round, second ball and first + second is not 10
             else if (currentRound == 0 && !isFirstBall && firstScore + secondScore != 10)
-            {
-                allRounds[currentRound].Score = firstScore + secondScore;
-            }
+                thisRound.Score = firstScore + secondScore;
 
             // If on last round and third score is active
             if (currentRound == 9 && allRounds[9].ThirdScoreActive)
             {
-                allRounds[currentRound].Score = allRounds[9].FirstScore + allRounds[9].SecondScore + allRounds[8].Score;
+                thisRound.Score = allRounds[9].FirstScore + allRounds[9].SecondScore + allRounds[8].Score;
 
                 /* Wait for user to enter third score on last round before adding it (otherwise it is set to -1 */
-                if (allRounds[currentRound].ThirdScore >= 0)
-                    allRounds[currentRound].Score += allRounds[currentRound].ThirdScore;
+                if (thisRound.ThirdScore >= 0)
+                    thisRound.Score += thisRound.ThirdScore;
             }
 
 

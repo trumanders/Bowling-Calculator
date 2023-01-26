@@ -16,10 +16,12 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         // Show dialog for number of players input
-        NumberOfPlayersDialog numberOfPlayersDialog = new NumberOfPlayersDialog();
+        NumberOfPlayersDialog numberOfPlayersDialog = new NumberOfPlayersDialog(PlayerManager.MaxNumberOfPlayers);
         numberOfPlayersDialog.ShowDialog();
         this.numberOfPlayers = numberOfPlayersDialog.NumberOfPlayers;
 
+        if (numberOfPlayers == 0)
+            Application.Current.Shutdown();
         layout = new Layout(this.Width, numberOfPlayers);        
         
         // Set window height based in the gridLayout parameters set in GenerateMainGrid-method.
