@@ -64,13 +64,13 @@ public class Calculator
                 }
             }
 
-            // Last round is strike on first ball or SPARE - If last round and ball 1+2 is 10 or more...
-            if (i == 9 && (allRounds[9].FirstScore + allRounds[9].SecondScore >= 10))
-            {
-                // Activate last round's third ball
-                allRounds[9].ThirdScoreActive = true;
-            }
-            else allRounds[9].ThirdScoreActive = false;
+            //// Last round is strike on first ball or SPARE - If last round and ball 1+2 is 10 or more...
+            //if (i == 9 && (allRounds[9].FirstScore + allRounds[9].SecondScore >= 10) || allRounds[9].SecondScore == 1)
+            //{
+            //    // Activate last round's third ball
+            //    allRounds[9].ThirdScoreActive = true;
+            //}
+            //else allRounds[9].ThirdScoreActive = false;
         }
     }
 
@@ -81,13 +81,30 @@ public class Calculator
     /// </summary>
     private void CalculateScores()
     {
-        bool isFirstBall;
-
         // Iterate through ball scores (one iteration for each ball, 21 ball scoers)
         for (int currentBall = 0; currentBall < Scoreboard.NumberOfBallScores - 1; currentBall++)
         {
-            if (currentBall % 2 == 0) isFirstBall = true;
-            else isFirstBall = false;
+            bool isFirstBall = false, isSecondBall = false, isThirdBall = false;
+
+            if (currentBall % 2 == 0)
+            {
+                isFirstBall = true;
+                isSecondBall = false;
+                isThirdBall = false;
+            }
+            else
+            {
+                isFirstBall = false;
+                isSecondBall = true;
+                isThirdBall = false;
+            }
+            if (currentBall == 20)
+            {
+                isFirstBall = false;
+                isSecondBall = false;
+                isThirdBall = true;
+            }
+                
 
             int currentRound = currentBall / 2;    // Two balls for each round.
             int firstScore = allRounds[currentRound].FirstScore;
@@ -106,9 +123,12 @@ public class Calculator
                 prevPrevRound = allRounds[currentRound - 2];
             }
 
-            if (IsSkippingScoreChecking(allRounds, currentRound, isFirstBall)) return;            
+            if (IsSkippingScoreChecking(allRounds, currentRound, isFirstBall))
+            {                
+                return;
+            }
 
-            // On first ball - both previous rounds is strike - (from round number 3)
+            // On first ball - both previous rounds are strikes - (from round number 3)
             if (currentRound > 1 && isFirstBall && prevPrevRound.IsStrike && prevRound.IsStrike)
             {
                 if (currentRound > 2)
@@ -130,7 +150,7 @@ public class Calculator
             if (thisRound.IsStrike) continue;
 
             /* On second ball - Previous round is Strike - set previous round score to include it's strike score + both balls on current round */
-            else if (currentRound > 0 && !isFirstBall && prevRound.IsStrike)
+            else if (currentRound > 0 && isSecondBall && prevRound.IsStrike)
             {
                 // Include round score from two rounds back + previous round's strike score (10) + current round score
                 if (currentRound > 1)                
@@ -146,37 +166,40 @@ public class Calculator
             }
 
             /* On second ball - current AND previous is not Stike and not Spare */
-            else if (currentRound > 0 && !isFirstBall && !thisRound.IsSpare && !thisRound.IsStrike && !prevRound.IsSpare)
+            else if (currentRound > 0 && (isSecondBall || isThirdBall) && !thisRound.IsSpare && !thisRound.IsStrike && !prevRound.IsSpare)
                 thisRound.Score = prevRound.Score + firstScore + secondScore;
 
             /* On second ball, not first round - Current is not Strike NOR Spare*/
-            else if (currentRound != 0 && !isFirstBall && !thisRound.IsSpare && !thisRound.IsStrike && prevRound.Score > 0)
+            else if (currentRound != 0 && isSecondBall && !thisRound.IsSpare && !thisRound.IsStrike && prevRound.Score > 0)
                 thisRound.Score = prevRound.Score + firstScore + secondScore;
 
             // If on first round, second ball and first + second is not 10
-            else if (currentRound == 0 && !isFirstBall && firstScore + secondScore != 10)
+            else if (currentRound == 0 && isSecondBall && firstScore + secondScore != 10)
                 thisRound.Score = firstScore + secondScore;
 
-            // If on last round and third score is active
-            if (currentRound == 9 && allRounds[9].ThirdScoreActive)
-            {
-                thisRound.Score = allRounds[9].FirstScore + allRounds[9].SecondScore + allRounds[8].Score;
+            // If on last round
+            if (currentBall == 18)            
+                thisRound.Score = prevRound.Score + thisRound.FirstScore;
+            if (currentBall == 19)
+                thisRound.Score = prevRound.Score + thisRound.FirstScore + thisRound.SecondScore;
+            if (currentBall == 20)
+                thisRound.Score = prevRound.Score + thisRound.FirstScore + thisRound.SecondScore + thisRound.ThirdScore;
 
-                /* Wait for user to enter third score on last round before adding it (otherwise it is set to -1 */
-                if (thisRound.ThirdScore >= 0)
-                    thisRound.Score += thisRound.ThirdScore;
-            }
+            /* Wait for user to enter third score on last round before adding it (otherwise it is set to -1 */
+            //if (thisRound.ThirdScore >= 0)
+            //        thisRound.Score = allRounds[9].FirstScore + allRounds[9].SecondScore + allRounds[9].ThirdScore + allRounds[8].Score;
+            //}
 
 
             /* Configure the final score textbox based on scores on the last round */
             // If third score is enabled (only possible for last round) and that score is entered (not -1).         
-            if (allRounds[currentRound].ThirdScoreActive && allRounds[currentRound].ThirdScore >= 0)
+            if (allRounds[currentRound].ThirdScore >= 0)
             {
                 /* Mark final score textbox*/
                 scoreboard.GetTextBox(31).BorderBrush = System.Windows.Media.Brushes.Green;
                 scoreboard.GetTextBox(31).BorderThickness = new Thickness(5, 5, 5, 5);
             }
-            else if (!allRounds[currentRound].ThirdScoreActive && currentBall == 19 && allRounds[currentRound].SecondScore >= 0)
+            else if (currentBall == 19 && allRounds[currentRound].SecondScore >= 0 && allRounds[currentRound].SecondScore + allRounds[currentRound - 1].SecondScore < 10)
             {
                 scoreboard.GetTextBox(31).BorderBrush = System.Windows.Media.Brushes.Green;
                 scoreboard.GetTextBox(31).BorderThickness = new Thickness(5, 5, 5, 5);
@@ -188,6 +211,8 @@ public class Calculator
                 scoreboard.GetTextBox(31).BorderBrush = System.Windows.Media.Brushes.Black;
                 scoreboard.GetTextBox(31).BorderThickness = new Thickness(3,3,3,3);
             }
+
+           
         }
     }
 

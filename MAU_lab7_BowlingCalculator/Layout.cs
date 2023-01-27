@@ -101,7 +101,16 @@ public class Layout
             playerTextbox.FontWeight = FontWeights.Bold;
             playerTextbox.TextAlignment = TextAlignment.Center;
             playerTextbox.VerticalContentAlignment = VerticalAlignment.Center;
+                        
+            //for (int textbox = 1; textbox <= 21; textbox++)
+            //{
+            //    TextBox ballScoreTextbox = PlayerManager.GetPlayer(player).Scoreboard.GetTextBox(textbox);
+            //    ballScoreTextbox.GetKeyBoard
+            //}
         }
+
+        // Set selectAll for ball-score textboxes
+        
     }
 
 

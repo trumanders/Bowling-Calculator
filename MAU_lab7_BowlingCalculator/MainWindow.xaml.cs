@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Windows.Input;
 
 namespace MAU_lab7_BowlingCalculator;
 
@@ -48,8 +49,42 @@ public partial class MainWindow : Window
             {                
                 // Define the text change event handler for each textbox.
                 layout.PlayerManager.GetPlayer(player).Scoreboard.GetTextBox(box).TextChanged += new TextChangedEventHandler(CalculateAll);
+
+                // Set select all text on focus for the textboxes
+                layout.PlayerManager.GetPlayer(player).Scoreboard.GetTextBox(box).GotKeyboardFocus += new KeyboardFocusChangedEventHandler(AutoSelectOnKeyboard);
+
+                // Set select text when clicking on textboxes
+                layout.PlayerManager.GetPlayer(player).Scoreboard.GetTextBox(box).MouseLeftButtonDown += new MouseButtonEventHandler(AutoSelectOnMouse);
+
+                // This event is needed to make the selection not immediately go away
+                layout.PlayerManager.GetPlayer(player).Scoreboard.GetTextBox(box).LostMouseCapture += new MouseEventHandler(AutoSelectOnMouse);
             }
         }             
+    }
+
+
+    /// <summary>
+    /// Fires when the user selects a ball score textbox with the keyboard, and selects all text in it.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void AutoSelectOnKeyboard(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        TextBox textbox = sender as TextBox;
+        if (textbox.Text != "1")
+            textbox.SelectAll();
+    }
+
+    /// <summary>
+    /// Fires when the user selects a ball score textbox with the mouse, and selects all text in it.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void AutoSelectOnMouse(object sender, MouseEventArgs e)
+    {
+        TextBox textbox = sender as TextBox;
+        if (textbox.Text != "1")
+            textbox.Select(0, 2);
     }
 
     private void SetResetButtonClickListener()
@@ -64,7 +99,11 @@ public partial class MainWindow : Window
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void CalculateAll(object sender, TextChangedEventArgs e)
-    {       
+    {
+        TextBox textbox = sender as TextBox;
+        if (Scoreboard.DisableTextChangeEventHandler)
+            return;
+
         calculator.CalculateAll(layout.PlayerManager);        
     }
 

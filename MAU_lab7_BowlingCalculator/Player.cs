@@ -4,8 +4,7 @@ public class Player
 {
     private Scoreboard scoreboard;
     private static int playerNumber = 0;
-    public Scoreboard Scoreboard {  get { return scoreboard; } }
-    
+    public Scoreboard Scoreboard {  get { return scoreboard; } }    
 
     public Player()
     {

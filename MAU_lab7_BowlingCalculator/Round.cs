@@ -8,7 +8,6 @@ public class Round
     private int score;
     private bool isSpare;
     private bool isStrike;
-    private bool thirdScoreActive;
 
 
     public int FirstScore { get { return firstScore; } set { firstScore = value; } }
@@ -16,8 +15,7 @@ public class Round
     public int ThirdScore { get { return thirdScore; } set { thirdScore = value; } }
     public int Score { get { return score; } set { score = value; } }        
     public bool IsSpare { get { return isSpare; } set { isSpare = value; } }
-    public bool IsStrike { get { return isStrike; } set { isStrike = value; } }
-    public bool ThirdScoreActive { get { return thirdScoreActive; } set { thirdScoreActive = value; } }
+    public bool IsStrike { get { return isStrike; } set { isStrike = value; } }    
 
 
     /// <summary>
@@ -36,6 +34,5 @@ public class Round
         this.secondScore = secondScore;
         this.isSpare = isSpare;
         this.isStrike = isStrike;
-        this.thirdScoreActive = thirdScoreActive;
     }
 }

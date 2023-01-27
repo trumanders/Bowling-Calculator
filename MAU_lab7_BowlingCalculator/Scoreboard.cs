@@ -7,24 +7,26 @@
 public class Scoreboard
 {
     public const int columns = 24;      // The number of grid squares for the width of the scoreboard
-    public const int rows = 2;          // The number of grid squares for the height of the scoreboard
+    public const int rows = 2;          // The number of grid squares for the height of the scoreboard    
+    public static bool DisableTextChangeEventHandler { get; set; }
     private static int numberOfRounds = 10;
     private static int numberOfTextBoxesInScoreboard = 32;
-    private static int numberOfBallScores = 21;    
+    private static int numberOfBallScores = 21;
     private int scoreboardNumber;
     private TextBox[] textBoxes;
     private TextBlock[] roundNumberText;
     private Round[] allRounds;
-
-
     public static int NumberOfRounds { get { return numberOfRounds; } }
     public static int NumberOfBallScores { get { return numberOfBallScores; } }
     public static int NumberOfTextBoxesInScoreboard { get { return numberOfTextBoxesInScoreboard; } }
     public Round[] AllRounds { get { return allRounds; } }
 
 
+
+
     public Scoreboard(int scoreboardNumber)
     {
+        DisableTextChangeEventHandler = false;
         allRounds = new Round[numberOfRounds];
         textBoxes = new TextBox[numberOfTextBoxesInScoreboard];
         roundNumberText = new TextBlock[numberOfRounds];
@@ -155,6 +157,54 @@ public class Scoreboard
             }
             else
                 textBoxes[i + 22].Text = allRounds[i].Score.ToString();
+
+            // Auto skip to second score frame if "1" is not entered in first score. (wait for "0")
+            if ((allRounds[i].FirstScore >= 0 && allRounds[i].FirstScore < 10) && (allRounds[i].FirstScore != 1))
+            {
+                if (i < 18)
+                    textBoxes[(i * 2) + 1 + 1].Focus();
+            }
+
+            // Auto skip to next round first score frame after entering second score
+            if ((allRounds[i].SecondScore != -1))
+            {
+                if (i < 18)
+                    textBoxes[(i * 2) + 1 + 2].Focus();
+            }
+
+            if ((i < 9 && allRounds[i].FirstScore == 10 && allRounds[i].SecondScore == 0))
+            {
+                DisableTextChangeEventHandler = true;
+                textBoxes[(i * 2) + 1].Text = "";
+                textBoxes[(i * 2) + 2].Text = "X";
+                DisableTextChangeEventHandler = false;
+            }
+
+            if (i == 9 && textBoxes[19].Text == "10")
+            {
+                DisableTextChangeEventHandler = true;
+                textBoxes[19].Text = "X";
+                textBoxes[20].Focus();
+                DisableTextChangeEventHandler = false;
+            }
+
+            if (i == 9 && textBoxes[20].Text == "10")
+            {
+                DisableTextChangeEventHandler = true;
+                textBoxes[20].Text = "X";
+                textBoxes[21].Focus();
+                DisableTextChangeEventHandler = false;
+            }
+
+            if (i == 9 && textBoxes[21].Text == "10")
+            {
+                DisableTextChangeEventHandler = true;
+                textBoxes[21].Text = "X";
+                DisableTextChangeEventHandler = false;
+            }
+
+            if (textBoxes[21].Text == "")
+                allRounds[9].ThirdScore == -1;
         }
     }
 
@@ -190,7 +240,6 @@ public class Scoreboard
     /// </summary>
     public void UIScoresToRounds()
     {
-
         ResetRounds();
 
         // Set third ball on round 10 as disabled as default
@@ -206,16 +255,16 @@ public class Scoreboard
         // The textboxes are number 1-21 in the textbox array
         for (int i = 1; i <= Scoreboard.NumberOfBallScores; i++)
         {
+            bool isStrikeAlreadyChecked = false;
 
             int currentRound = (i - 1) / 2;
 
-            /* Disable last round's third score if score 1 and 2 is less than 10 */
-            if (i == 20 && allRounds[9].FirstScore + allRounds[9].SecondScore < 10)
-            {
-                textBoxes[21].IsReadOnly = true;
-                textBoxes[i].IsEnabled = true;
-            }
-
+            ///* Disable last round's third score if score 1 and 2 is less than 10 */
+            //if (i == 20 && allRounds[9].FirstScore + allRounds[9].SecondScore < 10)
+            //{
+            //    textBoxes[21].IsReadOnly = true;
+            //    //textBoxes[i].IsEnabled = true;
+            //}
             //if (textBoxes[i].Text == "") break;
             if (i == 21)
             {
@@ -245,12 +294,35 @@ public class Scoreboard
 
             if (!int.TryParse(textBoxes[i].Text, out int ballScore))
             {
-
                 isValidScore = false;
 
-                if (isSecondBall && textBoxes[i].Text == "" && allRounds[currentRound].FirstScore == 10) // KEEP THIS
+                if (isSecondBall && textBoxes[i].Text == "" && allRounds[currentRound].FirstScore == 10)
+                    isValidScore = true;
+
+                if ((isFirstBall && textBoxes[i].Text == "" && textBoxes[i + 1].Text == "X") || (isSecondBall && textBoxes[i - 1].Text == "" && textBoxes[i].Text == "X"))
                 {
-                    isValidScore = true;              // KEEP THIS                    
+                    allRounds[currentRound].FirstScore = 10;
+                    allRounds[currentRound].SecondScore = 0;
+                    isValidScore = true;
+                    isStrikeAlreadyChecked = true;
+                }
+
+                if (currentRound == 9 && textBoxes[19].Text == "X")
+                {
+                    allRounds[currentRound].FirstScore = 10;
+                    isValidScore = true;
+                }
+
+                if (currentRound == 9 && textBoxes[20].Text == "X")
+                {
+                    allRounds[currentRound].SecondScore = 10;
+                    isValidScore = true;
+                }
+
+                if (currentRound == 9 && textBoxes[21].Text == "X")
+                {
+                    allRounds[currentRound].ThirdScore = 10;
+                    isValidScore = true;
                 }
             }
 
@@ -272,12 +344,15 @@ public class Scoreboard
                 isValidScore = false;
 
             // Entered second ball score too high
-            else if (isSecondBall && Convert.ToInt32(textBoxes[i].Text) + Convert.ToInt32(textBoxes[i - 1].Text) > 10)
+            else if (currentRound != 9 && isSecondBall && Convert.ToInt32(textBoxes[i].Text) + Convert.ToInt32(textBoxes[i - 1].Text) > 10)
             {
-                // If on last round-second ball, and first ball is strike, second ball can make 10 points too.
-                if (i == 20 && allRounds[currentRound].FirstScore == 10) isValidScore = true;
-                else isValidScore = false;
+
+                isValidScore = false;
             }
+
+            // If on last round-second ball, and first ball is strike, second ball can make 10 points too.
+            if (i == 20 && allRounds[currentRound].FirstScore == 10)
+                isValidScore = true;
 
             // Don't allow '0' (zero) on second score when first score is 10 (strike), unless it's the last round
             if (isSecondBall && allRounds[currentRound].FirstScore == 10 && textBoxes[i].Text == "0" && currentRound != 9)
@@ -293,19 +368,24 @@ public class Scoreboard
             }
 
 
-            else if (isValidScore)
+            else if (isValidScore && !isStrikeAlreadyChecked)
             {
                 if (isFirstBall)
                 {
                     allRounds[currentRound].FirstScore = ballScore;
+
+                    // If strike
                     if (ballScore == 10)
                     {
-                        allRounds[currentRound].SecondScore = 0;
+                        if (currentRound < 9)
+                            allRounds[currentRound].SecondScore = 0;
                     }
 
                 }
                 else if (isSecondBall)
                 {
+                    if (currentRound == 9 && allRounds[currentRound].SecondScore == 10)
+                        continue;
                     allRounds[currentRound].SecondScore = ballScore;
                 }
                 else if (isThirdBall) allRounds[currentRound].ThirdScore = ballScore;
@@ -313,18 +393,21 @@ public class Scoreboard
 
             // When on second score, round 10 (textbox 20), decice if third ball will be enabled:
             // If round 10's first + second ball score >= 10, then the third score is enabled, otherwise, exit loop.
-            if (i == 20)
-            {
-                if (allRounds[currentRound].FirstScore + allRounds[currentRound].SecondScore < 10)
-                {
-                    return;
-                }
-                else
-                {
-                    // Enable third score
-                    textBoxes[21].IsReadOnly = false;
-                }
-            }
+            //if (i == 20)
+            //{
+            //    if (allRounds[currentRound].FirstScore + allRounds[currentRound].SecondScore < 10)
+            //    {
+            //        return;
+            //    }
+            //    else
+            //    {
+            //        // Enable third score
+            //        textBoxes[21].IsReadOnly = false;
+            //    }
+            //}
+
+            //if (i == 19 && allRounds[currentRound].FirstScore == 10)
+            //    textBoxes[21].IsReadOnly = false;
         }
     }
 
@@ -346,7 +429,6 @@ public class Scoreboard
             round.Score = -1;
             round.IsSpare = false;
             round.IsStrike = false;
-            round.ThirdScoreActive = false;
         }
     }
 }
