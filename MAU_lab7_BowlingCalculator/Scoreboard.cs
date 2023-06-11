@@ -190,7 +190,6 @@ public class Scoreboard
     /// </summary>
     public void UIScoresToRounds()
     {
-
         ResetRounds();
 
         // Set third ball on round 10 as disabled as default
@@ -208,6 +207,8 @@ public class Scoreboard
         {
 
             int currentRound = (i - 1) / 2;
+            Round thisRound = allRounds[currentRound];
+            Round prevRound = allRounds[currentRound - 1];
 
             /* Disable last round's third score if score 1 and 2 is less than 10 */
             if (i == 20 && allRounds[9].FirstScore + allRounds[9].SecondScore < 10)
@@ -251,7 +252,7 @@ public class Scoreboard
             {
                 isValidScore = false;
 
-                if (isSecondBall && textBoxes[i].Text == "" && allRounds[currentRound].FirstScore == 10) // KEEP THIS
+                if (isSecondBall && textBoxes[i].Text == "" && thisRound.FirstScore == 10) // KEEP THIS
                 {
                     isValidScore = true;              // KEEP THIS                    
                 }
@@ -261,11 +262,11 @@ public class Scoreboard
                 isValidScore = false;
 
             // First score is entered without the score before beeing entered
-            else if (i > 1 && isFirstBall && allRounds[currentRound - 1].SecondScore == -1)
+            else if (i > 1 && isFirstBall && prevRound.SecondScore == -1)
                 isValidScore = false;
 
             // Second score is entered without first score beeing entered
-            else if (isSecondBall && allRounds[currentRound].FirstScore == -1)
+            else if (isSecondBall && thisRound.FirstScore == -1)
                 isValidScore = false;
 
             // Third score on last round is entered without second score beeing entered
@@ -276,20 +277,20 @@ public class Scoreboard
             else if (isSecondBall && Convert.ToInt32(textBoxes[i].Text) + Convert.ToInt32(textBoxes[i - 1].Text) > 10)
             {
                 // If on last round-second ball, and first ball is strike, second ball can make 10 points too.
-                if (i == 20 && allRounds[currentRound].FirstScore == 10) isValidScore = true;
+                if (i == 20 && thisRound.FirstScore == 10) isValidScore = true;
                 else isValidScore = false;
             }
 
             // Don't allow '0' (zero) on second score when first score is 10 (strike), unless it's the last round
-            if (isSecondBall && allRounds[currentRound].FirstScore == 10 && textBoxes[i].Text == "0" && currentRound != 9)
+            if (isSecondBall && thisRound.FirstScore == 10 && textBoxes[i].Text == "0" && currentRound != 9)
                 isValidScore = false;
 
 
             if (!isValidScore)
             {
-                if (isFirstBall) allRounds[currentRound].FirstScore = -1;
-                else if (isSecondBall) allRounds[currentRound].SecondScore = -1;
-                else if (isThirdBall) allRounds[currentRound].ThirdScore = -1;
+                if (isFirstBall) thisRound.FirstScore = -1;
+                else if (isSecondBall) thisRound.SecondScore = -1;
+                else if (isThirdBall) thisRound.ThirdScore = -1;
                 textBoxes[i].Text = "";  // make output later
             }
 
@@ -298,25 +299,50 @@ public class Scoreboard
             {
                 if (isFirstBall)
                 {
-                    allRounds[currentRound].FirstScore = ballScore;
+                    thisRound.FirstScore = ballScore;
                     if (ballScore == 10)
                     {
-                        allRounds[currentRound].SecondScore = 0;
+                        thisRound.VisualFirstScore = " ";
+                        thisRound.SecondScore = 0;
+                        thisRound.VisualSecondScore = "X";
                     }
+                    else if (ballScore == 0) { thisRound.VisualFirstScore = "-"; }
+                    else { thisRound.VisualFirstScore = ballScore.ToString(); }
 
                 }
                 else if (isSecondBall)
                 {
-                    allRounds[currentRound].SecondScore = ballScore;
+                    thisRound.SecondScore = ballScore;
+                    if (thisRound.FirstScore + ballScore == 10) { thisRound.VisualSecondScore = "/"; }
+                    else thisRound.VisualSecondScore = ballScore.ToString();
                 }
-                else if (isThirdBall) allRounds[currentRound].ThirdScore = ballScore;
+                else if (isThirdBall)
+                {
+                    thisRound.ThirdScore = ballScore;
+                    if (thisRound.FirstScore + thisRound.SecondScore >= 10)
+                    {
+                        if (ballScore == 10) thisRound.VisualThridScore = "X";
+                        else thisRound.VisualThridScore = ballScore.ToString();
+                    }
+                    if (thisRound.FirstScore == 10 && thisRound.SecondScore != 10)
+                    {
+                        if (thisRound.SecondScore + ballScore == 10) { thisRound.VisualThridScore = "/"; }
+                        else thisRound.VisualThridScore = ballScore.ToString();
+                    }
+                    if (thisRound.FirstScore == 10 && thisRound.SecondScore == 10)
+                    {
+                        if (ballScore == 10) thisRound.VisualThridScore = "X";
+                        else thisRound.VisualThridScore = ballScore.ToString();
+                    }
+                    if (ballScore == 0) thisRound.VisualThridScore = "-";
+                }
             }
 
             // When on second score, round 10 (textbox 20), decice if third ball will be enabled:
             // If round 10's first + second ball score >= 10, then the third score is enabled, otherwise, exit loop.
             if (i == 20)
             {
-                if (allRounds[currentRound].FirstScore + allRounds[currentRound].SecondScore < 10)
+                if (thisRound.FirstScore + thisRound.SecondScore < 10)
                 {
                     return;
                 }

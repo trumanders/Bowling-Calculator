@@ -5,15 +5,20 @@ public class Round
     private int firstScore = -1;
     private int secondScore = -1;
     private int thirdScore = -1;
+    private string visualFirstScore = "";
+    private string visualSecondScore = "";
+    private string visualThirdScore = "";
     private int score;
     private bool isSpare;
     private bool isStrike;
     private bool thirdScoreActive;
 
-
     public int FirstScore { get { return firstScore; } set { firstScore = value; } }
     public int SecondScore { get { return secondScore; } set { secondScore = value; } }
     public int ThirdScore { get { return thirdScore; } set { thirdScore = value; } }
+    public string VisualFirstScore { get { return visualFirstScore; } set { visualFirstScore = value; } }
+    public string VisualSecondScore { get { return visualSecondScore; } set { visualSecondScore = value; } }
+    public string VisualThridScore { get { return visualThirdScore; } set {  visualThirdScore = value; } }
     public int Score { get { return score; } set { score = value; } }        
     public bool IsSpare { get { return isSpare; } set { isSpare = value; } }
     public bool IsStrike { get { return isStrike; } set { isStrike = value; } }
