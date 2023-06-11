@@ -154,8 +154,14 @@ public class Scoreboard
                 textBoxes[i + 22].Text = "";
             }
             else
+            {
                 textBoxes[i + 22].Text = allRounds[i].Score.ToString();
+                int roundNumber = i + 1;
+                textBoxes[(roundNumber * 2) - 1].Text = allRounds[i].VisualFirstScore;
+                textBoxes[roundNumber * 2].Text = allRounds[i].VisualSecondScore;                
+            }
         }
+        textBoxes[21].Text = allRounds[9].VisualThridScore;
     }
 
 
@@ -207,8 +213,7 @@ public class Scoreboard
         {
 
             int currentRound = (i - 1) / 2;
-            Round thisRound = allRounds[currentRound];
-            Round prevRound = allRounds[currentRound - 1];
+            Round thisRound = allRounds[currentRound];            
 
             /* Disable last round's third score if score 1 and 2 is less than 10 */
             if (i == 20 && allRounds[9].FirstScore + allRounds[9].SecondScore < 10)
@@ -262,7 +267,7 @@ public class Scoreboard
                 isValidScore = false;
 
             // First score is entered without the score before beeing entered
-            else if (i > 1 && isFirstBall && prevRound.SecondScore == -1)
+            else if (i > 1 && isFirstBall && allRounds[currentRound - 1].SecondScore == -1)
                 isValidScore = false;
 
             // Second score is entered without first score beeing entered
