@@ -216,7 +216,7 @@ public class Scoreboard
                 textBoxes[i].IsEnabled = true;
             }
 
-            //if (textBoxes[i].Text == "") break;
+            // Last score box
             if (i == 21)
             {
                 currentRound = 9;       /* Prevent out of bounds since last round has three textboxex */
@@ -224,12 +224,16 @@ public class Scoreboard
                 isSecondBall = false;
                 isThirdBall = true;
             }
+
+            // Second ball
             else if (i % 2 == 0)
             {
                 isFirstBall = false;
                 isSecondBall = true;
                 isThirdBall = false;
             }
+
+            // First ball
             else if (i % 2 != 0)
             {
                 isFirstBall = true;
@@ -245,7 +249,6 @@ public class Scoreboard
 
             if (!int.TryParse(textBoxes[i].Text, out int ballScore))
             {
-
                 isValidScore = false;
 
                 if (isSecondBall && textBoxes[i].Text == "" && allRounds[currentRound].FirstScore == 10) // KEEP THIS
@@ -253,9 +256,7 @@ public class Scoreboard
                     isValidScore = true;              // KEEP THIS                    
                 }
             }
-
-
-            // if input > 10 OR < 0
+            
             else if (ballScore < 0 || ballScore > 10)
                 isValidScore = false;
 
