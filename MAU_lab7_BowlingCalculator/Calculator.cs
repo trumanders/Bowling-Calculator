@@ -90,10 +90,11 @@ public class Calculator
             else isFirstBall = false;
 
             int currentRound = currentBall / 2;    // Two balls for each round.
-            int firstScore = allRounds[currentRound].FirstScore;
-            int secondScore = allRounds[currentRound].SecondScore;
-            int thirdScore = allRounds[currentRound].ThirdScore;
             Round thisRound = allRounds[currentRound];
+            int firstScore = thisRound.FirstScore;
+            int secondScore = thisRound.SecondScore;
+            int thirdScore = thisRound.ThirdScore;
+            
             Round prevRound = new Round();
             Round prevPrevRound = new Round();
             if (currentRound > 0)

@@ -1,4 +1,6 @@
-﻿namespace MAU_lab7_BowlingCalculator;
+﻿using System.ComponentModel;
+
+namespace MAU_lab7_BowlingCalculator;
 
 /// <summary>
 /// Contains methods for creating the textboxes for the scoreboard.
@@ -41,6 +43,7 @@ public class Scoreboard
     /// </summary>
     private void CreateScoreboard()
     {
+        int row = 0;
         int adjustRowOrColumn = 0;
         for (int i = 0; i < textBoxes.Length; i++)
         {
@@ -48,8 +51,8 @@ public class Scoreboard
             // Adjust rows
 
             // Adjust the row to space the scoreboards correctly
-            // Board number 1 gives row 1, board number 2 gives row 4, and so on.
-            int row = (scoreboardNumber * 3) - 2;
+            // Board number 1 gives row 1, board number 2 gives row 4, board number 3 gives row 7, and so on.
+            row = (scoreboardNumber * 3) - 2;
 
             if (i == 0)
             {
@@ -145,6 +148,7 @@ public class Scoreboard
     /// </summary>
     public void RoundScoreToUI()
     {
+        
         // iterate through rounds and set the score boxes
         for (int i = 0; i < allRounds.Length; i++)
         {
@@ -156,10 +160,10 @@ public class Scoreboard
             else
             {
                 textBoxes[i + 22].Text = allRounds[i].Score.ToString();
-                int roundNumber = i + 1;
-                textBoxes[(roundNumber * 2) - 1].Text = allRounds[i].VisualFirstScore;
-                textBoxes[roundNumber * 2].Text = allRounds[i].VisualSecondScore;                
+                int roundNumber = i + 1;                            
             }
+            textBoxes[(i * 2) + 1].Text = allRounds[i].VisualFirstScore;
+            textBoxes[(i * 2) + 2].Text = allRounds[i].VisualSecondScore;
         }
         textBoxes[21].Text = allRounds[9].VisualThridScore;
     }
@@ -201,18 +205,19 @@ public class Scoreboard
         // Set third ball on round 10 as disabled as default
         //textBoxes[21].IsReadOnly = true;
 
+        const int LAST_ROUND_THIRD_BALL = 21;
+
         bool isValidScore = true;
         bool isFirstBall = false;
         bool isSecondBall = false;
         bool isThirdBall = false;
-
+        int currentRound;
         bool wasStrike = false;
 
         // The textboxes are number 1-21 in the textbox array
         for (int i = 1; i <= Scoreboard.NumberOfBallScores; i++)
         {
-
-            int currentRound = (i - 1) / 2;
+            currentRound = (i - 1) / 2;
             Round thisRound = allRounds[currentRound];            
 
             /* Disable last round's third score if score 1 and 2 is less than 10 */
@@ -223,7 +228,7 @@ public class Scoreboard
             }
 
             // Last score box
-            if (i == 21)
+            if (i == LAST_ROUND_THIRD_BALL)
             {
                 currentRound = 9;       /* Prevent out of bounds since last round has three textboxex */
                 isFirstBall = false;
